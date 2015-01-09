@@ -1,0 +1,27 @@
+{
+  "name": "object-oriented-javascript",
+  "version": "1.0.0",
+  "description": "Chicago Web Conf Object Oriented JavaScript Class Project",
+  "main": "index.html",
+  "scripts": {
+    "start": "node server.js",
+    "test": "mocha spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/devmynd/object-oriented-javascript.git"
+  },
+  "author": "Dayton Nolan, Michael Crismali",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/devmynd/object-oriented-javascript/issues"
+  },
+  "homepage": "https://github.com/devmynd/object-oriented-javascript",
+  "dependencies": {
+    "express": "^4.10.7"
+  },
+  "devDependencies": {
+    "expect.js": "^0.3.1",
+    "mocha": "^2.1.0"
+  }
+}
