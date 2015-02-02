@@ -7,10 +7,22 @@
   <body>
     <div id="mocha"></div>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/expect.js/0.2.0/expect.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/mocha/2.1.0/mocha.min.js"></script>
-    <script>mocha.setup("bdd")</script>
-    <script src="calculator_spec.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/chai/1.10.0/chai.js"></script>
+    <script src="support/chai-jquery.js"></script>
+
+    <script>
+      mocha.setup("bdd");
+    </script>
+
+    <script src="support/spec_helper.js"></script>
+    <script src="/js/autocomplete_list_item.js"></script>
+    <script src="/js/autocomplete.js"></script>
+    <script src="autocomplete_spec.js"></script>
+    <script src="autocomplete_list_item_spec.js"></script>
+
     <script>
       mocha.checkLeaks();
       mocha.globals(["jQuery"]);

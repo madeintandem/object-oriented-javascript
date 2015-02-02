@@ -1,9 +1,28 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Object Oriented JavaScript</title>
-</head>
-<body>
-  <h1>Hello World</h1>
-</body>
+  <head>
+    <link rel="stylesheet" type="text/css" href="stylesheets/reset.css">
+    <link rel="stylesheet" type="text/css" href="stylesheets/typography.css">
+    <link rel="stylesheet" type="text/css" href="stylesheets/autocomplete.css">
+    <title>Object Oriented JavaScript</title>
+  </head>
+
+  <body>
+    <h1>Object Oriented JavaScript</h1>
+    <hr/>
+    <input type="text" name="autocomplete" id="autocomplete-field" />
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.js"></script>
+    <script src="/js/autocomplete_list_item.js"></script>
+    <script src="/js/autocomplete.js"></script>
+    <script>
+      var autocompleteInstance = new Autocomplete("#autocomplete-field", [
+        { value: 1, text: "Apples" },
+        { value: 2, text: "Bananas" },
+        { value: 3, text: "Carrots" },
+        { value: 4, text: "Capers" },
+        { value: 5, text: "Corn" }
+      ]);
+    </script>
+  </body>
 </html>
