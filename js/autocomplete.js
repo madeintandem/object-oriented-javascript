@@ -1,20 +1,10 @@
 function Autocomplete(selector, items) {
   _.bindAll.apply(this, [this].concat(_.functions(this)));
-  this.createListItems(items);
-  this.$input = $(selector);
-  this.$input.wrap("<div class='autocomplete-container' />");
-  this.$input.addClass("autocomplete-input");
+  this.setupInput(selector);
   this.$el = this.$input.parent();
-  this.$el.append(_.template('<input name="<%= name %>" class="autocomplete-filter-input" value="<%= value %>" />', {
-    name: this.$input.attr("name") + "_filter_input",
-    value: this.$input.val()
-  }));
-  this.$filterInput = this.$el.find(".autocomplete-filter-input");
-  this.$input.hide();
-  this.$el.append("<ul class='autocomplete-list'/>");
-  this.$completionList = this.$el.find(".autocomplete-list");
-  this.filter = this.setFilter();
-
+  this.createFilterInput();
+  this.createCompletionList();
+  this.createListItems(items);
   this.registerEvents();
 }
 
@@ -28,8 +18,28 @@ Autocomplete.KEYCODES = {
   enter: 13
 };
 
-Autocomplete.prototype.registerEvents = function() {
-  this.$filterInput.on("keyup", this.handleInputKeydown);
+Autocomplete.KEYCODES = _.merge(Autocomplete.KEYCODES, _.invert(Autocomplete.KEYCODES));
+
+Autocomplete.prototype.filterInputTemplate = _.template("<input name='<%= name %>' class='autocomplete-filter-input' value='<%= value %>' />");
+
+Autocomplete.prototype.setupInput = function(selector) {
+  this.$input = $(selector);
+  this.$input.addClass("autocomplete-input");
+  this.$input.wrap("<div class='autocomplete-container' />");
+  this.$input.hide();
+};
+
+Autocomplete.prototype.createFilterInput = function() {
+  this.$el.append(this.filterInputTemplate({
+    name: this.$input.attr("name") + "_filter_input",
+    value: this.$input.val()
+  }));
+  this.$autocompleteInput = this.$el.find(".autocomplete-filter-input");
+};
+
+Autocomplete.prototype.createCompletionList = function() {
+  this.$el.append("<ul class='autocomplete-list'/>");
+  this.$completionList = this.$el.find(".autocomplete-list");
 };
 
 Autocomplete.prototype.createListItem = function(item) {
@@ -38,6 +48,10 @@ Autocomplete.prototype.createListItem = function(item) {
 
 Autocomplete.prototype.createListItems = function(items) {
   this.items = _.map(items, this.createListItem);
+};
+
+Autocomplete.prototype.registerEvents = function() {
+  this.$autocompleteInput.on("keyup", this.handleInputKeyup);
 };
 
 Autocomplete.prototype.renderItem = function(item) {
@@ -51,27 +65,17 @@ Autocomplete.prototype.render = function() {
 };
 
 Autocomplete.prototype.setFilter = function() {
-  this.filter = this.$filterInput.val() ? new RegExp("^" + this.$filterInput.val(), "i") : null;
+  this.filter = this.$autocompleteInput.val() ? new RegExp("^" + this.$autocompleteInput.val(), "i") : null;
 };
 
-Autocomplete.prototype.handleInputKeydown = function(evnt) {
-  console.log(evnt.keyCode);
-  console.log(this.getKey(evnt.keyCode));
+Autocomplete.prototype.handleInputKeyup = function(evnt) {
   this.setFilter();
   this.render();
-};
-
-Autocomplete.prototype.getKey = function(keyCode) {
-  return _.reduce(Autocomplete.KEYCODES, function(memo, code, key) {
-    if (code === keyCode) memo = key;
-    return memo;
-  }, undefined);
 };
 
 Autocomplete.prototype.handleItemClick = function(item) {
   this.$input.val(item.text);
   this.$completionList.hide();
-  console.log(this.$input.val());
 };
 
 Autocomplete.prototype.itemMatchesFilter = function(item) {
@@ -79,5 +83,5 @@ Autocomplete.prototype.itemMatchesFilter = function(item) {
 };
 
 Autocomplete.prototype.filteredItems = function() {
-  return _.where(this.items, this.itemMatchesFilter);
+  return this.filter ? _.where(this.items, this.itemMatchesFilter) : [];
 };
