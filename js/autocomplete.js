@@ -8,17 +8,14 @@ function Autocomplete(selector, items) {
   this.registerEvents();
 }
 
-Autocomplete.KEYCODES = {
+Autocomplete.COMMAND_KEYCODES = {
   up: 38,
   down: 40,
-  left: 37,
-  right: 39,
-  backspace: 8,
-  esc: 27,
+  escape: 27,
   enter: 13
 };
 
-Autocomplete.KEYCODES = _.merge(Autocomplete.KEYCODES, _.invert(Autocomplete.KEYCODES));
+Autocomplete.COMMAND_KEYCODES = _.merge(Autocomplete.COMMAND_KEYCODES, _.invert(Autocomplete.COMMAND_KEYCODES));
 
 Autocomplete.prototype.filterInputTemplate = _.template("<input name='<%= name %>' class='autocomplete-filter-input' value='<%= value %>' />");
 
@@ -68,9 +65,37 @@ Autocomplete.prototype.setFilter = function() {
   this.filter = this.$autocompleteInput.val() ? new RegExp("^" + this.$autocompleteInput.val(), "i") : null;
 };
 
-Autocomplete.prototype.handleInputKeyup = function(evnt) {
+Autocomplete.prototype.handleTextEntry = function() {
   this.setFilter();
   this.render();
+};
+
+Autocomplete.prototype.handleInputKeyup = function(evnt) {
+  if (_.contains(Autocomplete.COMMAND_KEYCODES, evnt.keyCode)) {
+    this.handleCommand(evnt.keyCode);
+  } else {
+    this.handleTextEntry();
+  }
+};
+
+Autocomplete.prototype.handleCommand = function(keyCode) {
+  this["handle" + _.capitalize(Autocomplete.COMMAND_KEYCODES[keyCode])]();
+};
+
+Autocomplete.prototype.handleUp = function() {
+
+};
+
+Autocomplete.prototype.handleDown = function() {
+
+};
+
+Autocomplete.prototype.handleEnter = function() {
+
+};
+
+Autocomplete.prototype.handleEscape = function() {
+
 };
 
 Autocomplete.prototype.handleItemClick = function(item) {
@@ -83,5 +108,5 @@ Autocomplete.prototype.itemMatchesFilter = function(item) {
 };
 
 Autocomplete.prototype.filteredItems = function() {
-  return this.filter ? _.where(this.items, this.itemMatchesFilter) : [];
+  return this.filter ? _.filter(this.items, this.itemMatchesFilter) : [];
 };

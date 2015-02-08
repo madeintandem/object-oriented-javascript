@@ -77,7 +77,7 @@ describe("Autocomplete", function() {
   describe("#filteredItems", function() {
     describe("when filter is present", function() {
       it("only returns items that match the filter", function() {
-        subject.filter = /1/;
+        subject.filter = /Test item 1/i;
         expect(subject.filteredItems()).to.have.lengthOf(1);
       });
     });
@@ -112,7 +112,104 @@ describe("Autocomplete", function() {
   describe("#handleInputKeyup", function() {
     beforeEach(function() {
       subject.$autocompleteInput.val("test");
-      subject.$autocompleteInput.trigger("keyup");
+      sinon.spy(subject, "handleTextEntry");
+      sinon.spy(subject, "handleCommand");
+    });
+
+    describe("command", function() {
+      beforeEach(function() {
+        subject.handleInputKeyup({ keyCode: Autocomplete.COMMAND_KEYCODES["enter"] });
+      });
+
+      it("does not handle text entry", function() {
+        expect(subject.handleTextEntry).to.not.have.been.called;
+      });
+
+      it("does handle commands", function() {
+        expect(subject.handleCommand).to.have.been.calledWith(Autocomplete.COMMAND_KEYCODES["enter"]);
+      });
+    });
+
+    describe("text", function() {
+      beforeEach(function() {
+        subject.handleInputKeyup({ keyCode: 84 });
+      });
+
+      it("handles text entry", function() {
+        expect(subject.handleTextEntry).to.have.been.called;
+      });
+
+      it("does not handle commands", function() {
+        expect(subject.handleCommand).to.not.have.been.called;
+      });
+    });
+  });
+
+  describe("#handleCommand", function() {
+    beforeEach(function() {
+      sinon.spy(subject, "handleUp");
+      sinon.spy(subject, "handleDown");
+      sinon.spy(subject, "handleEnter");
+      sinon.spy(subject, "handleEscape");
+    });
+
+    describe("up", function() {
+      beforeEach(function() {
+        subject.handleCommand(Autocomplete.COMMAND_KEYCODES["up"]);
+      });
+
+      it("handles up", function() {
+        expect(subject.handleUp).to.have.been.called;
+        expect(subject.handleDown).to.not.have.been.called;
+        expect(subject.handleEnter).to.not.have.been.called;
+        expect(subject.handleEscape).to.not.have.been.called;
+      });
+    });
+
+    describe("down", function() {
+      beforeEach(function() {
+        subject.handleCommand(Autocomplete.COMMAND_KEYCODES["down"]);
+      });
+
+      it("handles down", function() {
+        expect(subject.handleDown).to.have.been.called;
+        expect(subject.handleUp).to.not.have.been.called;
+        expect(subject.handleEnter).to.not.have.been.called;
+        expect(subject.handleEscape).to.not.have.been.called;
+      });
+    });
+
+    describe("enter", function() {
+      beforeEach(function() {
+        subject.handleCommand(Autocomplete.COMMAND_KEYCODES["enter"]);
+      });
+
+      it("handles enter", function() {
+        expect(subject.handleEnter).to.have.been.called;
+        expect(subject.handleUp).to.not.have.been.called;
+        expect(subject.handleDown).to.not.have.been.called;
+        expect(subject.handleEscape).to.not.have.been.called;
+      });
+    });
+
+    describe("escape", function() {
+      beforeEach(function() {
+        subject.handleCommand(Autocomplete.COMMAND_KEYCODES["escape"]);
+      });
+
+      it("handles escape", function() {
+        expect(subject.handleEscape).to.have.been.called;
+        expect(subject.handleUp).to.not.have.been.called;
+        expect(subject.handleDown).to.not.have.been.called;
+        expect(subject.handleEnter).to.not.have.been.called;
+      });
+    });
+  });
+
+  describe("#handleTextEntry", function() {
+    beforeEach(function() {
+      subject.$autocompleteInput.val("test");
+      subject.handleTextEntry();
     });
 
     it("sets the filter", function() {
@@ -139,23 +236,17 @@ describe("Autocomplete", function() {
     });
   });
 
-  describe("keycode map", function() {
-    it("is a map of keys and their corresponding key codes", function() {
-      expect(Autocomplete.KEYCODES.up).to.equal(38);
-      expect(Autocomplete.KEYCODES.down).to.equal(40);
-      expect(Autocomplete.KEYCODES.left).to.equal(37);
-      expect(Autocomplete.KEYCODES.right).to.equal(39);
-      expect(Autocomplete.KEYCODES.backspace).to.equal(8);
-      expect(Autocomplete.KEYCODES.esc).to.equal(27);
-      expect(Autocomplete.KEYCODES.enter).to.equal(13);
+  describe("command keycode map", function() {
+    it("is a map of command keys and their corresponding key codes", function() {
+      expect(Autocomplete.COMMAND_KEYCODES.up).to.equal(38);
+      expect(Autocomplete.COMMAND_KEYCODES.down).to.equal(40);
+      expect(Autocomplete.COMMAND_KEYCODES.escape).to.equal(27);
+      expect(Autocomplete.COMMAND_KEYCODES.enter).to.equal(13);
 
-      expect(Autocomplete.KEYCODES[38]).to.equal("up");
-      expect(Autocomplete.KEYCODES[40]).to.equal("down");
-      expect(Autocomplete.KEYCODES[37]).to.equal("left");
-      expect(Autocomplete.KEYCODES[39]).to.equal("right");
-      expect(Autocomplete.KEYCODES[8]).to.equal("backspace");
-      expect(Autocomplete.KEYCODES[27]).to.equal("esc");
-      expect(Autocomplete.KEYCODES[13]).to.equal("enter");
+      expect(Autocomplete.COMMAND_KEYCODES[38]).to.equal("up");
+      expect(Autocomplete.COMMAND_KEYCODES[40]).to.equal("down");
+      expect(Autocomplete.COMMAND_KEYCODES[27]).to.equal("escape");
+      expect(Autocomplete.COMMAND_KEYCODES[13]).to.equal("enter");
     });
   });
 });
