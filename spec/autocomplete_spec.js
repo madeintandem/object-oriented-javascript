@@ -5,7 +5,8 @@ describe("Autocomplete", function() {
     appendFixture("input", { id: "autocomplete", type: "text", name: "autocomplete" });
     items = [
       { value: 1, text: "Test item 1" },
-      { value: 2, text: "Test item 2" }
+      { value: 2, text: "Test item 2" },
+      { value: 3, text: "Test item 3" }
     ];
     subject = new Autocomplete("#autocomplete", items);
   });
@@ -14,10 +15,6 @@ describe("Autocomplete", function() {
     expect(subject.$input).to.exist;
     expect(subject.$input).to.have.id("autocomplete");
     expect(subject.$input[0].tagName).to.equal("INPUT");
-  });
-
-  it("adds the autocomplete-input class to the $input", function() {
-    expect(subject.$input).to.have.class("autocomplete-input");
   });
 
   it("wraps the element in an .autocomplete-container", function() {
@@ -30,11 +27,11 @@ describe("Autocomplete", function() {
   });
 
   it("creates a filter input", function() {
-    expect(subject.$autocompleteInput).to.exist;
+    expect(subject.autocompleteInput).to.be.an.instanceof(AutocompleteInput);
   });
 
   it("creates a list for autocompleted items", function() {
-    expect(subject.$completionList).to.exist;
+    expect(subject.completionList).to.be.an.instanceof(AutocompleteList);
   });
 
   it("creates an completionListItem for each item", function() {
@@ -42,35 +39,6 @@ describe("Autocomplete", function() {
     expect(subject.items.length).to.equal(items.length);
     _.each(subject.items, function(item) {
       expect(item).to.be.an.instanceof(AutocompleteListItem);
-    });
-  });
-
-  it("has a filter input template", function() {
-    expect(subject.filterInputTemplate).to.be.a("function");
-    var renderedTemplate = subject.filterInputTemplate({ name: "foo", value: "foo text" });
-    expect(renderedTemplate).to.match(/name='foo'/);
-    expect(renderedTemplate).to.match(/value='foo text'/);
-  });
-
-  describe("#registerEvents", function() {
-    it("handles key press events", function() {
-      var called = false;
-      var spy = function() {
-        called = true;
-      };
-      subject.handleInputKeyup = spy;
-      subject.registerEvents();
-      subject.$autocompleteInput.trigger("keyup");
-      expect(called).to.be.true;
-    });
-  });
-
-  describe("#render", function() {
-    it("appends the list of items that match the filter", function() {
-      subject.filter = /.+/;
-      subject.render();
-      expect(subject.$completionList).to.have.descendants("li");
-      expect(subject.$completionList).to.be.visible;
     });
   });
 
@@ -93,8 +61,7 @@ describe("Autocomplete", function() {
   describe("#setFilter", function() {
     describe("with input value", function() {
       it("sets the filter based on the input", function() {
-        subject.$autocompleteInput.val("test value 1");
-        subject.setFilter();
+        subject.setFilter("test value 1");
         expect("Test Value 1").to.match(subject.filter);
         expect("Test Value 2").not.to.match(subject.filter);
       });
@@ -102,45 +69,8 @@ describe("Autocomplete", function() {
 
     describe("no input value", function() {
       it("sets the filter to null", function() {
-        subject.$autocompleteInput.val("");
-        subject.setFilter();
+        subject.setFilter("");
         expect(subject.filter).to.be.null;
-      });
-    });
-  });
-
-  describe("#handleInputKeyup", function() {
-    beforeEach(function() {
-      subject.$autocompleteInput.val("test");
-      sinon.spy(subject, "handleTextEntry");
-      sinon.spy(subject, "handleCommand");
-    });
-
-    describe("command", function() {
-      beforeEach(function() {
-        subject.handleInputKeyup({ keyCode: Autocomplete.COMMAND_KEYCODES["enter"] });
-      });
-
-      it("does not handle text entry", function() {
-        expect(subject.handleTextEntry).to.not.have.been.called;
-      });
-
-      it("does handle commands", function() {
-        expect(subject.handleCommand).to.have.been.calledWith(Autocomplete.COMMAND_KEYCODES["enter"]);
-      });
-    });
-
-    describe("text", function() {
-      beforeEach(function() {
-        subject.handleInputKeyup({ keyCode: 84 });
-      });
-
-      it("handles text entry", function() {
-        expect(subject.handleTextEntry).to.have.been.called;
-      });
-
-      it("does not handle commands", function() {
-        expect(subject.handleCommand).to.not.have.been.called;
       });
     });
   });
@@ -155,7 +85,7 @@ describe("Autocomplete", function() {
 
     describe("up", function() {
       beforeEach(function() {
-        subject.handleCommand(Autocomplete.COMMAND_KEYCODES["up"]);
+        subject.handleCommand("up");
       });
 
       it("handles up", function() {
@@ -168,7 +98,7 @@ describe("Autocomplete", function() {
 
     describe("down", function() {
       beforeEach(function() {
-        subject.handleCommand(Autocomplete.COMMAND_KEYCODES["down"]);
+        subject.handleCommand("down");
       });
 
       it("handles down", function() {
@@ -181,7 +111,7 @@ describe("Autocomplete", function() {
 
     describe("enter", function() {
       beforeEach(function() {
-        subject.handleCommand(Autocomplete.COMMAND_KEYCODES["enter"]);
+        subject.handleCommand("enter");
       });
 
       it("handles enter", function() {
@@ -194,7 +124,7 @@ describe("Autocomplete", function() {
 
     describe("escape", function() {
       beforeEach(function() {
-        subject.handleCommand(Autocomplete.COMMAND_KEYCODES["escape"]);
+        subject.handleCommand("escape");
       });
 
       it("handles escape", function() {
@@ -208,22 +138,20 @@ describe("Autocomplete", function() {
 
   describe("#handleTextEntry", function() {
     beforeEach(function() {
-      subject.$autocompleteInput.val("test");
-      subject.handleTextEntry();
+      subject.handleTextEntry("test");
     });
 
     it("sets the filter", function() {
       expect(subject.filter).to.exist;
     });
 
-    it("renders", function() {
-      expect(subject.$completionList).to.have.descendants("li");
+    xit("renders the completion list", function() {
+      expect(subject.completionList.$el).to.have.descendants("li");
     });
   });
 
   describe("#handleItemClick", function() {
     beforeEach(function() {
-      subject.$autocompleteInput.val("test");
       subject.handleItemClick(_.first(subject.items));
     });
 
@@ -232,21 +160,13 @@ describe("Autocomplete", function() {
     });
 
     it("hides the completion list", function() {
-      expect(subject.$completionList).to.not.be.visible;
+      expect(subject.completionList.$el).to.have.class("hidden");
     });
   });
 
-  describe("command keycode map", function() {
-    it("is a map of command keys and their corresponding key codes", function() {
-      expect(Autocomplete.COMMAND_KEYCODES.up).to.equal(38);
-      expect(Autocomplete.COMMAND_KEYCODES.down).to.equal(40);
-      expect(Autocomplete.COMMAND_KEYCODES.escape).to.equal(27);
-      expect(Autocomplete.COMMAND_KEYCODES.enter).to.equal(13);
+  describe("#selectNextItem", function() {
+  });
 
-      expect(Autocomplete.COMMAND_KEYCODES[38]).to.equal("up");
-      expect(Autocomplete.COMMAND_KEYCODES[40]).to.equal("down");
-      expect(Autocomplete.COMMAND_KEYCODES[27]).to.equal("escape");
-      expect(Autocomplete.COMMAND_KEYCODES[13]).to.equal("enter");
-    });
+  describe("#handleDown", function() {
   });
 });

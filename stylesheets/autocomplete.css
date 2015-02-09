@@ -21,6 +21,10 @@
   border-left: solid 1px #efefef;
 }
 
+.autocomplete-container .autocomplete-list.hidden {
+  display: none;
+}
+
 .autocomplete-container .autocomplete-list li {
   float: left;
   display: block;
@@ -37,11 +41,7 @@
   color: black;
 }
 
-.autocomplete-container .autocomplete-list li a:hover,
-.autocomplete-container .autocomplete-list li.selected a {
-  background-color: #efefef;
-}
-
-.autocomplete-container .autocomplete-list li a:active {
+.autocomplete-container .autocomplete-list li a:active,
+.autocomplete-container .autocomplete-list .selected {
   background-color: #66ccff;
 }
