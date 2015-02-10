@@ -8,10 +8,7 @@ describe("Autocomplete", function() {
       { value: 2, text: "Test item 2" },
       { value: 3, text: "Test item 3" }
     ];
-    subject = new Autocomplete({
-      selector: "#autocomplete",
-      items: items
-    });
+    subject = new Autocomplete({ selector: "#autocomplete", url: "test" });
   });
 
   it("requires a selector", function() {
@@ -20,70 +17,64 @@ describe("Autocomplete", function() {
     }).to.throw("Autocomplete: selector is undefined");
   });
 
-  it("has a reference to the input", function() {
-    expect(subject.$input).to.exist;
-    expect(subject.$input).to.have.id("autocomplete");
-    expect(subject.$input[0].tagName).to.equal("INPUT");
+  it("requires a url or an items array", function() {
+    expect(function() {
+      new Autocomplete({ selector: "#autocomplete" });
+    }).to.throw("Autocomplete: items or url is undefined");
   });
 
-  it("wraps the element in an .autocomplete-container", function() {
-    expect(subject.$el).to.exist;
-    expect(subject.$el).to.have.class("autocomplete-container");
-  });
-
-  it("hides the original input", function() {
-    expect(subject.$input).not.to.be.visible;
-  });
-
-  it("creates a filter input", function() {
-    expect(subject.autocompleteInput).to.be.an.instanceof(AutocompleteInput);
-  });
-
-  it("creates a list for autocompleted items", function() {
-    expect(subject.completionList).to.be.an.instanceof(AutocompleteList);
-  });
-
-  it("has items", function() {
-    expect(subject.items).to.be.an("Array");
-    expect(subject.items).to.equal(items);
-  });
-
-  it("has an empty items array by default", function() {
-    subject = new Autocomplete({ selector: "#autocomplete" });
-    expect(subject.items).to.be.an("Array");
-    expect(subject.items).to.be.empty;
-  });
-
-  describe("#filteredItems", function() {
-    describe("when filter is present", function() {
-      xit("only returns items that match the filter", function() {
-        subject.filter = /Test item 1/i;
-        expect(subject.filteredItems()).to.have.lengthOf(1);
-      });
+  describe("initialize", function() {
+    it("has a reference to the input", function() {
+      expect(subject.$input).to.exist;
+      expect(subject.$input).to.have.id("autocomplete");
+      expect(subject.$input[0].tagName).to.equal("INPUT");
     });
 
-    describe("when filter is absent", function() {
-      xit("returns no items", function() {
-        subject.filter = null;
-        expect(subject.filteredItems()).to.have.lengthOf(0);
+    it("wraps the element in an .autocomplete-container", function() {
+      expect(subject.$el).to.exist;
+      expect(subject.$el).to.have.class("autocomplete-container");
+    });
+
+    it("hides the original input", function() {
+      expect(subject.$input).not.to.be.visible;
+    });
+
+    it("creates a filter input", function() {
+      expect(subject.autocompleteInput).to.be.an.instanceof(AutocompleteInput);
+    });
+
+    it("creates a list for autocompleted items", function() {
+      expect(subject.completionList).to.be.an.instanceof(AutocompleteList);
+    });
+
+    describe("when items are passed", function() {
+      it("has a local adapter", function() {
+        subject = new Autocomplete({
+          selector: "#autocomplete",
+          items: items
+        });
+        expect(subject.adapter).to.be.an.instanceof(AutocompleteLocalAdapter);
       });
     });
   });
 
-  describe("#setFilter", function() {
-    describe("with input value", function() {
-      it("sets the filter based on the input", function() {
-        subject.setFilter("test value 1");
-        expect("Test Value 1").to.match(subject.filter);
-        expect("Test Value 2").not.to.match(subject.filter);
-      });
+  describe("#render", function() {
+    it("appends the autocomplete input to the element", function() {
+      expect(subject.$el).to.have.descendants(".autocomplete-input");
     });
 
-    describe("no input value", function() {
-      it("sets the filter to null", function() {
-        subject.setFilter("");
-        expect(subject.filter).to.be.null;
-      });
+    it("appends the autocomplete list to the element", function() {
+      expect(subject.$el).to.have.descendants(".autocomplete-list");
+    });
+  });
+
+  describe("#handleAutocomplete", function() {
+    beforeEach(function() {
+      subject.handleAutocomplete(items);
+    });
+
+    it("renders the completion list", function() {
+      expect(subject.completionList.$el).to.have.descendants("li");
     });
   });
 
@@ -148,17 +139,6 @@ describe("Autocomplete", function() {
     });
   });
 
-  describe("#handleTextEntry", function() {
-    beforeEach(function() {
-      subject.handleTextEntry("test");
-    });
-
-    it("sets the filter", function() {
-      expect(subject.filter).to.exist;
-    });
-
-    xit("renders the completion list", function() {
-      expect(subject.completionList.$el).to.have.descendants("li");
-    });
+  describe("handleDown", function() {
   });
 });
