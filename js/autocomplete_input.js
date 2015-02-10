@@ -1,17 +1,21 @@
-function AutocompleteInput(name, value, options) {
-  if (_.isUndefined(name)) throw new Error("AutocompleteInput: name is undefined");
-  if (_.isUndefined(value)) throw new Error("AutocompleteInput: value is undefined");
-  this.options = options || {};
-  _.defaults(this.options, {
+function AutocompleteInput(attributes) {
+  this.attributes = attributes || {};
+  _.bindAll.apply(this, [this].concat(_.functions(this)));
+  if (_.isUndefined(this.attributes.name)) throw new Error("AutocompleteInput: name is undefined");
+  if (_.isUndefined(this.attributes.value)) throw new Error("AutocompleteInput: value is undefined");
+
+  _.defaults(this.attributes, {
     onTextEntry: function() { throw new Error("AutocompleteInput: onTextEntry is undefined"); },
-    onCommand: function() { throw new Error("AutocompleteInput: onCommand is undefined"); }
+    onCommandEntry: function() { throw new Error("AutocompleteInput: onCommandEntry is undefined"); }
   });
-  this.name = name;
-  this.value = value;
+
+  this.name = this.attributes.name + "_autocomplete_input";
+  this.value = this.attributes.value;
   this.$el = $(this.template({
     name: this.name,
     value: this.value
   }));
+  this.$el.on("keyup", this.handleKeyup);
 }
 
 AutocompleteInput.CMD_KEYCODES = {
@@ -28,9 +32,9 @@ AutocompleteInput.prototype.template = _.template("<input name='<%= name %>' cla
 AutocompleteInput.prototype.handleKeyup = function(evnt) {
   if (this.isCommandKey(evnt.keyCode)) {
     var command = AutocompleteInput.CMD_KEYCODES[evnt.keyCode];
-    this.options.onCommand(command);
+    this.attributes.onCommandEntry(command);
   } else {
-    this.options.onTextEntry(this.$el.val());
+    this.attributes.onTextEntry(this.$el.val());
   }
 };
 

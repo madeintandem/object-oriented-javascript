@@ -8,7 +8,16 @@ describe("Autocomplete", function() {
       { value: 2, text: "Test item 2" },
       { value: 3, text: "Test item 3" }
     ];
-    subject = new Autocomplete("#autocomplete", items);
+    subject = new Autocomplete({
+      selector: "#autocomplete",
+      items: items
+    });
+  });
+
+  it("requires a selector", function() {
+    expect(function() {
+      new Autocomplete;
+    }).to.throw("Autocomplete: selector is undefined");
   });
 
   it("has a reference to the input", function() {
@@ -34,24 +43,27 @@ describe("Autocomplete", function() {
     expect(subject.completionList).to.be.an.instanceof(AutocompleteList);
   });
 
-  it("creates an completionListItem for each item", function() {
+  it("has items", function() {
     expect(subject.items).to.be.an("Array");
-    expect(subject.items.length).to.equal(items.length);
-    _.each(subject.items, function(item) {
-      expect(item).to.be.an.instanceof(AutocompleteListItem);
-    });
+    expect(subject.items).to.equal(items);
+  });
+
+  it("has an empty items array by default", function() {
+    subject = new Autocomplete({ selector: "#autocomplete" });
+    expect(subject.items).to.be.an("Array");
+    expect(subject.items).to.be.empty;
   });
 
   describe("#filteredItems", function() {
     describe("when filter is present", function() {
-      it("only returns items that match the filter", function() {
+      xit("only returns items that match the filter", function() {
         subject.filter = /Test item 1/i;
         expect(subject.filteredItems()).to.have.lengthOf(1);
       });
     });
 
     describe("when filter is absent", function() {
-      it("returns no items", function() {
+      xit("returns no items", function() {
         subject.filter = null;
         expect(subject.filteredItems()).to.have.lengthOf(0);
       });
@@ -75,7 +87,7 @@ describe("Autocomplete", function() {
     });
   });
 
-  describe("#handleCommand", function() {
+  describe("#handleCommandEntry", function() {
     beforeEach(function() {
       sinon.spy(subject, "handleUp");
       sinon.spy(subject, "handleDown");
@@ -85,7 +97,7 @@ describe("Autocomplete", function() {
 
     describe("up", function() {
       beforeEach(function() {
-        subject.handleCommand("up");
+        subject.handleCommandEntry("up");
       });
 
       it("handles up", function() {
@@ -98,7 +110,7 @@ describe("Autocomplete", function() {
 
     describe("down", function() {
       beforeEach(function() {
-        subject.handleCommand("down");
+        subject.handleCommandEntry("down");
       });
 
       it("handles down", function() {
@@ -111,7 +123,7 @@ describe("Autocomplete", function() {
 
     describe("enter", function() {
       beforeEach(function() {
-        subject.handleCommand("enter");
+        subject.handleCommandEntry("enter");
       });
 
       it("handles enter", function() {
@@ -124,7 +136,7 @@ describe("Autocomplete", function() {
 
     describe("escape", function() {
       beforeEach(function() {
-        subject.handleCommand("escape");
+        subject.handleCommandEntry("escape");
       });
 
       it("handles escape", function() {
@@ -148,25 +160,5 @@ describe("Autocomplete", function() {
     xit("renders the completion list", function() {
       expect(subject.completionList.$el).to.have.descendants("li");
     });
-  });
-
-  describe("#handleItemClick", function() {
-    beforeEach(function() {
-      subject.handleItemClick(_.first(subject.items));
-    });
-
-    it("sets the input's value to the text", function() {
-      expect(subject.$input).to.have.value("Test item 1");
-    });
-
-    it("hides the completion list", function() {
-      expect(subject.completionList.$el).to.have.class("hidden");
-    });
-  });
-
-  describe("#selectNextItem", function() {
-  });
-
-  describe("#handleDown", function() {
   });
 });

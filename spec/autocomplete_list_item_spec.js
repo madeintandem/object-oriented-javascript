@@ -77,7 +77,11 @@ describe("AutocompleteListItem", function() {
 
       beforeEach(function() {
         called = false;
-        subject = new AutocompleteListItem({ value: "", text: "" }, { onClick: function() { called = true; } });
+        subject = new AutocompleteListItem({
+          value: "",
+          text: "",
+          onClick: function() { called = true }
+        });
         subject.handleClick();
       });
 
@@ -91,7 +95,11 @@ describe("AutocompleteListItem", function() {
     var called;
     beforeEach(function() {
       called = false;
-      subject = new AutocompleteListItem({ value: "", text: "" }, { onClick: function() { called = true; } });
+      subject = new AutocompleteListItem({
+        value: "",
+        text: "",
+        onClick: function() { called = true; }
+      });
       subject.$el.trigger("click");
     });
 

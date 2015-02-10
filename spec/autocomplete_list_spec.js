@@ -4,10 +4,7 @@ describe("AutocompleteList", function() {
   var item2;
   var items;
   beforeEach(function() {
-    item1 = new AutocompleteListItem({ value: 1, text: "Test item 1" });
-    item2 = new AutocompleteListItem({ value: 2, text: "Test item 2" });
-    items = [item1, item2];
-    subject = new AutocompleteList;
+    subject = new AutocompleteList({ onItemClick: sinon.spy() });
   });
 
   it("has an element", function() {
@@ -21,6 +18,17 @@ describe("AutocompleteList", function() {
 
   it("is hidden by default", function() {
     expect(subject.$el).to.have.class("hidden");
+  });
+
+  it("requires an onItemClick option", function() {
+    subject = new AutocompleteList;
+    expect(function() {
+      subject.attributes.onItemClick();
+    }).to.throw("AutocompleteList: onItemClick is undefined");
+  });
+
+  it("has attributes", function() {
+    expect(subject.attributes).to.have.key("onItemClick");
   });
 
   describe("#hide", function() {
@@ -40,8 +48,20 @@ describe("AutocompleteList", function() {
   });
 
   describe("#render", function() {
+    var items;
     beforeEach(function() {
+      item1 = { value: 1, text: "Test item 1" };
+      item2 = { value: 2, text: "Test item 2" };
+      items = [item1, item2];
       subject.render(items);
+    });
+
+    it("creates an completionListItem for each item", function() {
+      expect(subject.items).to.be.an("Array");
+      expect(subject.items.length).to.equal(items.length);
+      _.each(subject.items, function(item) {
+        expect(item).to.be.an.instanceof(AutocompleteListItem);
+      });
     });
 
     it("appends each item to the element", function() {
@@ -74,4 +94,23 @@ describe("AutocompleteList", function() {
       });
     });
   });
+
+  describe("#handleItemClick", function() {
+    var clickedItem;
+    beforeEach(function() {
+      subject.render(items);
+      subject.show();
+      clickedItem = _.first(subject.items);
+      subject.handleItemClick(clickedItem);
+    });
+
+    it("calls the onItemClick callback, passing the item clicked", function() {
+      expect(subject.attributes.onItemClick).to.have.been.calledWith(clickedItem);
+    });
+
+    it("hides the completion list", function() {
+      expect(subject.$el).to.have.class("hidden");
+    });
+  });
 });
+

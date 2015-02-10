@@ -1,10 +1,19 @@
-function Autocomplete(selector, items) {
+function Autocomplete(attributes) {
+  this.attributes = attributes || {};
+  if (_.isUndefined(this.attributes.selector)) throw new Error("Autocomplete: selector is undefined");
+
   _.bindAll.apply(this, [this].concat(_.functions(this)));
-  this.setupInput(selector);
+  this.setupInput(this.attributes.selector);
+  this.items = this.attributes.items || [];
   this.$el = this.$input.parent();
   this.completionList = new AutocompleteList;
-  this.autocompleteInput = new AutocompleteInput(this.$input.attr("name"), this.$input.val());
-  this.createListItems(items);
+  this.autocompleteInput = new AutocompleteInput({
+    name: this.$input.attr("name"),
+    value: this.$input.val(),
+    onTextEntry: this.handleTextEntry,
+    onCommandEntry: this.handleCommandEntry
+  });
+  this.render();
 }
 
 Autocomplete.prototype.setupInput = function(selector) {
@@ -13,12 +22,9 @@ Autocomplete.prototype.setupInput = function(selector) {
   this.$input.hide();
 };
 
-Autocomplete.prototype.createListItem = function(item) {
-  return new AutocompleteListItem(item, { onClick: this.handleItemClick });
-};
-
-Autocomplete.prototype.createListItems = function(items) {
-  this.items = _.map(items, this.createListItem);
+Autocomplete.prototype.render = function() {
+  this.$el.append(this.autocompleteInput.$el);
+  this.$el.append(this.completionList.$el);
 };
 
 Autocomplete.prototype.setFilter = function(text) {
@@ -30,12 +36,7 @@ Autocomplete.prototype.handleTextEntry = function(text) {
   this.completionList.render(this.filteredItems());
 };
 
-Autocomplete.prototype.handleItemClick = function(item) {
-  this.$input.val(item.text);
-  this.completionList.hide();
-};
-
-Autocomplete.prototype.handleCommand = function(command) {
+Autocomplete.prototype.handleCommandEntry = function(command) {
   this["handle" + _.capitalize(command)]();
 };
 
@@ -52,9 +53,6 @@ Autocomplete.prototype.handleEnter = function() {
 
 Autocomplete.prototype.handleEscape = function() {
   console.log("escape");
-};
-
-Autocomplete.prototype.selectNextItem = function() {
 };
 
 Autocomplete.prototype.itemMatchesFilter = function(item) {

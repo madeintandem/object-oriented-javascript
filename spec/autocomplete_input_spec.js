@@ -2,31 +2,31 @@ describe("AutocompleteInput", function() {
   var subject;
   var name;
   var value;
-  var options;
   beforeEach(function() {
     name = "test";
     value = "test value";
-    options = {
+    subject = new AutocompleteInput({
+      name: name,
+      value: value,
       onTextEntry: sinon.spy(),
-      onCommand: sinon.spy()
-    };
-    subject = new AutocompleteInput(name, value, options);
+      onCommandEntry: sinon.spy()
+    });
   });
 
   it("requires a name", function() {
     expect(function() {
-      new AutocompleteInput;
+      new AutocompleteInput({ value: value });
     }).to.throw("AutocompleteInput: name is undefined");
   });
 
   it("requires a value", function() {
     expect(function() {
-      new AutocompleteInput(name);
+      new AutocompleteInput({ name: name });
     }).to.throw("AutocompleteInput: value is undefined");
   });
 
-  it("has a name", function() {
-    expect(subject.name).to.equal(name);
+  it("has a name with `_autocomplete_input` appended", function() {
+    expect(subject.name).to.equal(name + "_autocomplete_input");
   });
 
   it("has a value", function() {
@@ -36,22 +36,28 @@ describe("AutocompleteInput", function() {
   it("has an element", function() {
     expect(subject.$el).to.exist;
     expect(subject.$el).to.have.class("autocomplete-input");
-    expect(subject.$el).to.have.attr("name", name);
+    expect(subject.$el).to.have.attr("name", name + "_autocomplete_input");
     expect(subject.$el).to.have.attr("value", value);
   });
 
   it("has a default onTextEntry handler that throws an error", function() {
-    subject = new AutocompleteInput(name, value);
+    subject = new AutocompleteInput({
+      name: name,
+      value: value
+    });
     expect(function() {
-      subject.options.onTextEntry();
+      subject.attributes.onTextEntry();
     }).to.throw("AutocompleteInput: onTextEntry is undefined");
   });
 
-  it("has a default onCommand handler that throws an error", function() {
-    subject = new AutocompleteInput(name, value);
+  it("has a default onCommandEntry handler that throws an error", function() {
+    subject = new AutocompleteInput({
+      name: name,
+      value: value
+    });
     expect(function() {
-      subject.options.onCommand();
-    }).to.throw("AutocompleteInput: onCommand is undefined");
+      subject.attributes.onCommandEntry();
+    }).to.throw("AutocompleteInput: onCommandEntry is undefined");
   });
 
   it("has a command keycodes constant", function() {
@@ -114,11 +120,11 @@ describe("AutocompleteInput", function() {
       });
 
       it("does not call the onTextEntry callback", function() {
-        expect(subject.options.onTextEntry).to.not.have.been.called;
+        expect(subject.attributes.onTextEntry).to.not.have.been.called;
       });
 
-      it("calls the onCommand callback with the given command", function() {
-        expect(subject.options.onCommand).to.have.been.calledWith("enter");
+      it("calls the onCommandEntry callback with the given command", function() {
+        expect(subject.attributes.onCommandEntry).to.have.been.calledWith("enter");
       });
     });
 
@@ -129,11 +135,11 @@ describe("AutocompleteInput", function() {
       });
 
       it("calls the onTextEntry callback", function() {
-        expect(subject.options.onTextEntry).to.have.been.calledWith("test");
+        expect(subject.attributes.onTextEntry).to.have.been.calledWith("test");
       });
 
-      it("does not call the onCommand callback with the given command", function() {
-        expect(subject.options.onCommand).not.to.have.been.called;
+      it("does not call the onCommandEntry callback with the given command", function() {
+        expect(subject.attributes.onCommandEntry).not.to.have.been.called;
       });
     });
   });

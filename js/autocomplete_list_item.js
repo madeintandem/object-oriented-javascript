@@ -1,12 +1,16 @@
-function AutocompleteListItem(data, options) {
+function AutocompleteListItem(attributes) {
+  this.attributes = attributes || {};
   _.bindAll.apply(this, [this].concat(_.functions(this)));
-  this.value = data.value;
-  this.text = data.text;
-  this.options = options || {};
-  _.defaults(this.options, {
+
+  this.value = this.attributes.value;
+  this.text = this.attributes.text;
+  _.defaults(this.attributes, {
     onClick: function() { throw new Error("AutocompleteListItem: onClick is undefined"); }
   });
-  this.$el = $(this.template(data));
+  this.$el = $(this.template({
+    value: this.attributes.value,
+    text: this.attributes.text
+  }));
   this.selected = false;
 
   this.registerEvents();
@@ -19,7 +23,7 @@ AutocompleteListItem.prototype.registerEvents = function() {
 };
 
 AutocompleteListItem.prototype.handleClick = function() {
-  this.options.onClick(this);
+  this.attributes.onClick(this);
 };
 
 AutocompleteListItem.prototype.select = function() {
