@@ -80,10 +80,10 @@ describe("Autocomplete", function() {
 
   describe("#handleCommandEntry", function() {
     beforeEach(function() {
-      sinon.spy(subject, "handleUp");
-      sinon.spy(subject, "handleDown");
-      sinon.spy(subject, "handleEnter");
-      sinon.spy(subject, "handleEscape");
+      sinon.stub(subject, "handleUp");
+      sinon.stub(subject, "handleDown");
+      sinon.stub(subject, "handleEnter");
+      sinon.stub(subject, "handleEscape");
     });
 
     describe("up", function() {
