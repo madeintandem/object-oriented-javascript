@@ -6,7 +6,7 @@ describe("AutocompleteListItem", function() {
   beforeEach(function() {
     testText = "Test Item";
     testValue = 1;
-    subject = new AutocompleteListItem({ value: testValue, text: testText });
+    subject = new AutocompleteListItem({ item: { value: testValue, text: testText }});
   });
 
   it("has an element", function() {
@@ -29,46 +29,46 @@ describe("AutocompleteListItem", function() {
     expect(renderedTemplate).to.match(/foo/);
   });
 
-  it("has a selected state", function() {
-    expect(subject.selected).to.be.false;
+  it("has a active state", function() {
+    expect(subject.active).to.be.false;
+  });
+
+  describe("#activate", function() {
+    beforeEach(function() {
+      subject.activate();
+    });
+
+    it("sets active to true", function() {
+      expect(subject.active).to.be.true;
+    });
+
+    it("adds the active class to el", function() {
+      expect(subject.$el).to.have.class("active");
+    });
+  });
+
+  describe("#deactivate", function() {
+    beforeEach(function() {
+      subject.active = true;
+      subject.$el.addClass("active");
+      subject.deactivate();
+    });
+
+    it("sets active to false", function() {
+      expect(subject.active).to.be.false;
+    });
+
+    it("removes the active class from el", function() {
+      expect(subject.$el).to.not.have.class("active");
+    });
   });
 
   describe("#select", function() {
-    beforeEach(function() {
-      subject.select();
-    });
-
-    it("sets selected to true", function() {
-      expect(subject.selected).to.be.true;
-    });
-
-    it("adds the selected class to el", function() {
-      expect(subject.$el).to.have.class("selected");
-    });
-  });
-
-  describe("#deselect", function() {
-    beforeEach(function() {
-      subject.selected = true;
-      subject.$el.addClass("selected");
-      subject.deselect();
-    });
-
-    it("sets selected to false", function() {
-      expect(subject.selected).to.be.false;
-    });
-
-    it("removes the selected class from el", function() {
-      expect(subject.$el).to.not.have.class("selected");
-    });
-  });
-
-  describe("#handleClick", function() {
     describe("defaults", function() {
       it("raises an error", function() {
         expect(function() {
-          subject.handleClick();
-        }).to.throw(/onClick is undefined/);
+          subject.select();
+        }).to.throw(/onSelect is undefined/);
       });
     });
 
@@ -78,11 +78,13 @@ describe("AutocompleteListItem", function() {
       beforeEach(function() {
         called = false;
         subject = new AutocompleteListItem({
-          value: "",
-          text: "",
-          onClick: function() { called = true }
+          item: {
+            value: "",
+            text: ""
+          },
+          onSelect: function() { called = true }
         });
-        subject.handleClick();
+        subject.select();
       });
 
       it("calls the onClick function", function() {
@@ -96,9 +98,11 @@ describe("AutocompleteListItem", function() {
     beforeEach(function() {
       called = false;
       subject = new AutocompleteListItem({
-        value: "",
-        text: "",
-        onClick: function() { called = true; }
+        item: {
+          value: "",
+          text: ""
+        },
+        onSelect: function() { called = true; }
       });
       subject.$el.trigger("click");
     });

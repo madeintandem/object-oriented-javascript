@@ -42,6 +42,6 @@
 }
 
 .autocomplete-container .autocomplete-list li a:active,
-.autocomplete-container .autocomplete-list .selected {
+.autocomplete-container .autocomplete-list .active {
   background-color: #66ccff;
 }

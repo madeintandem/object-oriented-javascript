@@ -40,11 +40,17 @@ describe("Autocomplete", function() {
     });
 
     it("creates a filter input", function() {
+       var expectedName = subject.$input.attr("name") + "_autocomplete_input";
       expect(subject.autocompleteInput).to.be.an.instanceof(AutocompleteInput);
+      expect(subject.autocompleteInput.name).to.equal(expectedName);
+      expect(subject.autocompleteInput.value).to.equal(subject.$input.val());
+      expect(subject.autocompleteInput.attributes.onTextEntry).to.equal(subject.adapter.handleTextEntry);
+      expect(subject.autocompleteInput.attributes.onCommandEntry).to.equal(subject.completionList.handleCommandEntry);
     });
 
     it("creates a list for autocompleted items", function() {
       expect(subject.completionList).to.be.an.instanceof(AutocompleteList);
+      expect(subject.completionList.attributes.onItemSelect).to.equal(subject.handleItemSelect);
     });
 
     describe("when items are passed", function() {
@@ -68,77 +74,19 @@ describe("Autocomplete", function() {
     });
   });
 
-  describe("#handleAutocomplete", function() {
+  describe("#handleItemSelect", function() {
+    var item;
     beforeEach(function() {
-      subject.handleAutocomplete(items);
+      item = new AutocompleteListItem({ item: _.first(items) });
+      subject.handleItemSelect(item);
     });
 
-    it("renders the completion list", function() {
-      expect(subject.completionList.$el).to.have.descendants("li");
-    });
-  });
-
-  describe("#handleCommandEntry", function() {
-    beforeEach(function() {
-      sinon.stub(subject, "handleUp");
-      sinon.stub(subject, "handleDown");
-      sinon.stub(subject, "handleEnter");
-      sinon.stub(subject, "handleEscape");
+    it("sets the $input's value to the item's value", function() {
+      expect(subject.$input.val()).to.equal(item.value.toString());
     });
 
-    describe("up", function() {
-      beforeEach(function() {
-        subject.handleCommandEntry("up");
-      });
-
-      it("handles up", function() {
-        expect(subject.handleUp).to.have.been.called;
-        expect(subject.handleDown).to.not.have.been.called;
-        expect(subject.handleEnter).to.not.have.been.called;
-        expect(subject.handleEscape).to.not.have.been.called;
-      });
+    it("displays the item's text in the autocomplete input", function() {
+      expect(subject.autocompleteInput.$el).to.have.value(item.text);
     });
-
-    describe("down", function() {
-      beforeEach(function() {
-        subject.handleCommandEntry("down");
-      });
-
-      it("handles down", function() {
-        expect(subject.handleDown).to.have.been.called;
-        expect(subject.handleUp).to.not.have.been.called;
-        expect(subject.handleEnter).to.not.have.been.called;
-        expect(subject.handleEscape).to.not.have.been.called;
-      });
-    });
-
-    describe("enter", function() {
-      beforeEach(function() {
-        subject.handleCommandEntry("enter");
-      });
-
-      it("handles enter", function() {
-        expect(subject.handleEnter).to.have.been.called;
-        expect(subject.handleUp).to.not.have.been.called;
-        expect(subject.handleDown).to.not.have.been.called;
-        expect(subject.handleEscape).to.not.have.been.called;
-      });
-    });
-
-    describe("escape", function() {
-      beforeEach(function() {
-        subject.handleCommandEntry("escape");
-      });
-
-      it("handles escape", function() {
-        expect(subject.handleEscape).to.have.been.called;
-        expect(subject.handleUp).to.not.have.been.called;
-        expect(subject.handleDown).to.not.have.been.called;
-        expect(subject.handleEnter).to.not.have.been.called;
-      });
-    });
-  });
-
-  describe("handleDown", function() {
   });
 });

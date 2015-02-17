@@ -2,16 +2,16 @@ function AutocompleteListItem(attributes) {
   this.attributes = attributes || {};
   _.bindAll.apply(this, [this].concat(_.functions(this)));
 
-  this.value = this.attributes.value;
-  this.text = this.attributes.text;
+  this.value = attributes.item.value;
+  this.text = attributes.item.text;
   _.defaults(this.attributes, {
-    onClick: function() { throw new Error("AutocompleteListItem: onClick is undefined"); }
+    onSelect: function() { throw new Error("AutocompleteListItem: onSelect is undefined"); }
   });
   this.$el = $(this.template({
-    value: this.attributes.value,
-    text: this.attributes.text
+    value: this.value,
+    text: this.text
   }));
-  this.selected = false;
+  this.active = false;
 
   this.registerEvents();
 }
@@ -19,19 +19,19 @@ function AutocompleteListItem(attributes) {
 AutocompleteListItem.prototype.template = _.template('<li class="autocomplete-list-item"><a href="#"><%= text %></a></li>');
 
 AutocompleteListItem.prototype.registerEvents = function() {
-  this.$el.on("click", this.handleClick);
-};
-
-AutocompleteListItem.prototype.handleClick = function() {
-  this.attributes.onClick(this);
+  this.$el.on("click", this.select);
 };
 
 AutocompleteListItem.prototype.select = function() {
-  this.selected = true;
-  this.$el.addClass("selected");
+  this.attributes.onSelect(this);
 };
 
-AutocompleteListItem.prototype.deselect = function() {
-  this.selected = false;
-  this.$el.removeClass("selected");
+AutocompleteListItem.prototype.activate = function() {
+  this.active = true;
+  this.$el.addClass("active");
+};
+
+AutocompleteListItem.prototype.deactivate = function() {
+  this.active = false;
+  this.$el.removeClass("active");
 };

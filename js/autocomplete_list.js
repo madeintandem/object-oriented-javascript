@@ -2,7 +2,7 @@
   _.bindAll.apply(this, [this].concat(_.functions(this)));
   this.attributes = attributes || {};
   _.defaults(this.attributes, {
-    onItemClick: function() { throw new Error("AutocompleteList: onItemClick is undefined"); }
+    onItemSelect: function() { throw new Error("AutocompleteList: onItemSelect is undefined"); }
   });
 
   this.initialize();
@@ -36,11 +36,11 @@ AutocompleteList.prototype.createListItems = function(items) {
 };
 
 AutocompleteList.prototype.createListItem = function(item) {
-  return new AutocompleteListItem(item, { onClick: this.handleItemClick });
+  return new AutocompleteListItem({ item: item, onSelect: this.handleItemSelect });
 };
 
-AutocompleteList.prototype.handleItemClick = function(item) {
-  this.attributes.onItemClick(item);
+AutocompleteList.prototype.handleItemSelect = function(item) {
+  this.attributes.onItemSelect(item);
   this.hide();
 };
 
@@ -52,30 +52,57 @@ AutocompleteList.prototype.renderItem = function(item) {
   this.$el.append(item.$el);
 };
 
-AutocompleteList.prototype.selectedItem = function() {
-  return _.find(this.items, "selected");
+AutocompleteList.prototype.activeItem = function() {
+  return _.find(this.items, "active");
 };
 
 AutocompleteList.prototype.nextItem = function() {
-  var nextIndex = _.indexOf(this.items, this.selectedItem()) + 1;
+  var nextIndex = _.indexOf(this.items, this.activeItem()) + 1;
   var nextItem = this.items[nextIndex] || _.first(this.items);
   return nextItem;
 };
 
-AutocompleteList.prototype.selectNextItem = function() {
-  var currentlySelected = this.selectedItem();
-  this.nextItem().select();
-  if (currentlySelected) currentlySelected.deselect();
+AutocompleteList.prototype.activateNextItem = function() {
+  var currentlySelected = this.activeItem();
+  this.nextItem().activate();
+  if (currentlySelected) {
+    currentlySelected.deactivate();
+  }
 };
 
 AutocompleteList.prototype.previousItem = function() {
-  var previousIndex = _.indexOf(this.items, this.selectedItem()) - 1;
+  var previousIndex = _.indexOf(this.items, this.activeItem()) - 1;
   var previousItem = this.items[previousIndex] || _.last(this.items);
   return previousItem;
 };
 
-AutocompleteList.prototype.selectPreviousItem = function() {
-  var currentlySelected = this.selectedItem();
-  this.previousItem().select();
-  if (currentlySelected) currentlySelected.deselect();
+AutocompleteList.prototype.activatePreviousItem = function() {
+  var currentlySelected = this.activeItem();
+  this.previousItem().activate();
+  if (currentlySelected) {
+    currentlySelected.deactivate();
+  }
+};
+
+AutocompleteList.prototype.handleCommandEntry = function(command) {
+  this["handle" + _.capitalize(command)]();
+};
+
+AutocompleteList.prototype.handleDown = function() {
+  this.activateNextItem();
+};
+
+AutocompleteList.prototype.handleUp = function() {
+  this.activatePreviousItem();
+};
+
+AutocompleteList.prototype.handleEnter = function() {
+  var activeItem = this.activeItem();
+  if (activeItem) {
+    activeItem.select();
+  }
+};
+
+AutocompleteList.prototype.handleEscape = function() {
+  this.hide();
 };

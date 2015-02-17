@@ -9,18 +9,18 @@ describe("AutocompleteList", function() {
     item2 = { value: 2, text: "Test item 2" };
     item3 = { value: 3, text: "Test item 3" };
     items = [item1, item2, item3];
-    subject = new AutocompleteList({ onItemClick: sinon.spy() });
+    subject = new AutocompleteList({ onItemSelect: sinon.spy() });
   });
 
-  it("requires an onItemClick option", function() {
+  it("requires an onItemSelect option", function() {
     subject = new AutocompleteList;
     expect(function() {
-      subject.attributes.onItemClick();
-    }).to.throw("AutocompleteList: onItemClick is undefined");
+      subject.attributes.onItemSelect();
+    }).to.throw("AutocompleteList: onItemSelect is undefined");
   });
 
   it("has attributes", function() {
-    expect(subject.attributes).to.have.key("onItemClick");
+    expect(subject.attributes).to.have.key("onItemSelect");
   });
 
   describe("#initialize", function() {
@@ -93,17 +93,17 @@ describe("AutocompleteList", function() {
     });
   });
 
-  describe("#handleItemClick", function() {
-    var clickedItem;
+  describe("#handleItemSelect", function() {
+    var selectedItem;
     beforeEach(function() {
       subject.render(items);
       subject.show();
-      clickedItem = _.first(subject.items);
-      subject.handleItemClick(clickedItem);
+      selectedItem = _.first(subject.items);
+      subject.handleItemSelect(selectedItem);
     });
 
-    it("calls the onItemClick callback, passing the item clicked", function() {
-      expect(subject.attributes.onItemClick).to.have.been.calledWith(clickedItem);
+    it("calls the onItemSelect callback, passing the item clicked", function() {
+      expect(subject.attributes.onItemSelect).to.have.been.calledWith(selectedItem);
     });
 
     it("hides the completion list", function() {
@@ -111,19 +111,19 @@ describe("AutocompleteList", function() {
     });
   });
 
-  describe("#selectedItem", function() {
+  describe("#activeItem", function() {
     beforeEach(function() {
       subject.createListItems(items);
     });
 
-    it("returns undefined when no item is selected", function() {
-      expect(subject.selectedItem()).to.be.undefined;
+    it("returns undefined when no item is active", function() {
+      expect(subject.activeItem()).to.be.undefined;
     });
 
-    it("returns the selected item when one is selected", function() {
-      var selectedItem = _.first(subject.items);
-      selectedItem.select();
-      expect(subject.selectedItem()).to.equal(selectedItem);
+    it("returns the active item when one is active", function() {
+      var activeItem = _.first(subject.items);
+      activeItem.activate();
+      expect(subject.activeItem()).to.equal(activeItem);
     });
   });
 
@@ -132,15 +132,15 @@ describe("AutocompleteList", function() {
       subject.createListItems(items);
     });
 
-    describe("when no items are selected", function() {
+    describe("when no items are active", function() {
       it("returns the first item", function() {
         expect(subject.nextItem()).to.equal(_.first(subject.items));
       });
     });
 
-    describe("when an item is selected", function() {
+    describe("when an item is active", function() {
       beforeEach(function() {
-        _.first(subject.items).select();
+        _.first(subject.items).activate();
       });
 
       it("returns the next item in the items array", function() {
@@ -148,46 +148,46 @@ describe("AutocompleteList", function() {
       });
     });
 
-    describe("when the last item is already selected", function() {
+    describe("when the last item is already active", function() {
       it("returns the first item", function() {
-        _.last(subject.items).select();
+        _.last(subject.items).activate();
         expect(subject.nextItem()).to.equal(_.first(subject.items));
       });
     });
   });
 
-  describe("#selectNextItem", function() {
+  describe("#activateNextItem", function() {
     beforeEach(function() {
       subject.createListItems(items);
     });
 
-    describe("when no items are selected", function() {
-      it("selects the first item", function() {
-        subject.selectNextItem();
-        expect(_.first(subject.items).selected).to.be.true;
+    describe("when no items are active", function() {
+      it("activates the first item", function() {
+        subject.activateNextItem();
+        expect(_.first(subject.items).active).to.be.true;
       });
     });
 
-    describe("when an item is selected", function() {
+    describe("when an item is active", function() {
       beforeEach(function() {
-        _.first(subject.items).select();
-        subject.selectNextItem();
+        _.first(subject.items).activate();
+        subject.activateNextItem();
       });
 
-      it("selects the next item in the items array", function() {
-        expect(subject.items[1].selected).to.be.true;
+      it("activates the next item in the items array", function() {
+        expect(subject.items[1].active).to.be.true;
       });
 
-      it("deselects the previously selected item", function() {
-        expect(_.first(subject.items).selected).to.be.false;
+      it("deactivates the previously active item", function() {
+        expect(_.first(subject.items).active).to.be.false;
       });
     });
 
-    describe("when the last item is already selected", function() {
-      it("selects the first item", function() {
-        _.last(subject.items).select();
-        subject.selectNextItem();
-        expect(_.first(subject.items).selected).to.be.true;
+    describe("when the last item is already active", function() {
+      it("activates the first item", function() {
+        _.last(subject.items).activate();
+        subject.activateNextItem();
+        expect(_.first(subject.items).active).to.be.true;
       });
     });
   });
@@ -197,15 +197,15 @@ describe("AutocompleteList", function() {
       subject.createListItems(items);
     });
 
-    describe("when no items are selected", function() {
+    describe("when no items are active", function() {
       it("returns the last item", function() {
         expect(subject.previousItem()).to.equal(_.last(subject.items));
       });
     });
 
-    describe("when an item is selected", function() {
+    describe("when an item is active", function() {
       beforeEach(function() {
-        _.last(subject.items).select();
+        _.last(subject.items).activate();
       });
 
       it("returns the next item in the items array", function() {
@@ -213,48 +213,168 @@ describe("AutocompleteList", function() {
       });
     });
 
-    describe("when the first item is already selected", function() {
+    describe("when the first item is already active", function() {
       it("returns the last item", function() {
-        _.first(subject.items).select();
+        _.first(subject.items).activate();
         expect(subject.previousItem()).to.equal(_.last(subject.items));
       });
     });
   });
 
-  describe("#selectPreviousItem", function() {
+  describe("#activatePreviousItem", function() {
     beforeEach(function() {
       subject.createListItems(items);
     });
 
-    describe("when no items are selected", function() {
-      it("selects the last item", function() {
-        subject.selectPreviousItem();
-        expect(_.last(subject.items).selected).to.be.true;
+    describe("when no items are active", function() {
+      it("activates the last item", function() {
+        subject.activatePreviousItem();
+        expect(_.last(subject.items).active).to.be.true;
       });
     });
 
-    describe("when an item is selected", function() {
+    describe("when an item is active", function() {
       beforeEach(function() {
-        _.last(subject.items).select();
-        subject.selectPreviousItem();
+        _.last(subject.items).activate();
+        subject.activatePreviousItem();
       });
 
-      it("selects the previous item in the items array", function() {
-        expect(subject.items[1].selected).to.be.true;
+      it("activates the previous item in the items array", function() {
+        expect(subject.items[1].active).to.be.true;
       });
 
-      it("deselects the previously selected item", function() {
-        expect(_.last(subject.items).selected).to.be.false;
+      it("deactivates the previously active item", function() {
+        expect(_.last(subject.items).active).to.be.false;
       });
     });
 
-    describe("when the first item is already selected", function() {
-      it("selects the last item", function() {
-        _.first(subject.items).select();
-        subject.selectPreviousItem();
-        expect(_.last(subject.items).selected).to.be.true;
+    describe("when the first item is already active", function() {
+      it("activates the last item", function() {
+        _.first(subject.items).activate();
+        subject.activatePreviousItem();
+        expect(_.last(subject.items).active).to.be.true;
+      });
+    });
+  });
+
+  describe("#handleCommandEntry", function() {
+    beforeEach(function() {
+      sinon.stub(subject, "handleUp");
+      sinon.stub(subject, "handleDown");
+      sinon.stub(subject, "handleEnter");
+      sinon.stub(subject, "handleEscape");
+    });
+
+    describe("up", function() {
+      beforeEach(function() {
+        subject.handleCommandEntry("up");
+      });
+
+      it("handles up", function() {
+        expect(subject.handleUp).to.have.been.called;
+        expect(subject.handleDown).to.not.have.been.called;
+        expect(subject.handleEnter).to.not.have.been.called;
+        expect(subject.handleEscape).to.not.have.been.called;
+      });
+    });
+
+    describe("down", function() {
+      beforeEach(function() {
+        subject.handleCommandEntry("down");
+      });
+
+      it("handles down", function() {
+        expect(subject.handleDown).to.have.been.called;
+        expect(subject.handleUp).to.not.have.been.called;
+        expect(subject.handleEnter).to.not.have.been.called;
+        expect(subject.handleEscape).to.not.have.been.called;
+      });
+    });
+
+    describe("enter", function() {
+      beforeEach(function() {
+        subject.handleCommandEntry("enter");
+      });
+
+      it("handles enter", function() {
+        expect(subject.handleEnter).to.have.been.called;
+        expect(subject.handleUp).to.not.have.been.called;
+        expect(subject.handleDown).to.not.have.been.called;
+        expect(subject.handleEscape).to.not.have.been.called;
+      });
+    });
+
+    describe("escape", function() {
+      beforeEach(function() {
+        subject.handleCommandEntry("escape");
+      });
+
+      it("handles escape", function() {
+        expect(subject.handleEscape).to.have.been.called;
+        expect(subject.handleUp).to.not.have.been.called;
+        expect(subject.handleDown).to.not.have.been.called;
+        expect(subject.handleEnter).to.not.have.been.called;
+      });
+    });
+  });
+
+  describe("#handleDown", function() {
+    beforeEach(function() {
+      sinon.spy(subject, "activateNextItem");
+      subject.createListItems(items);
+      subject.handleDown();
+    });
+
+    it("activates the next item", function() {
+      expect(subject.activateNextItem).to.have.been.called;
+    });
+  });
+
+  describe("#handleUp", function() {
+    beforeEach(function() {
+      subject.createListItems(items);
+      sinon.spy(subject, "activatePreviousItem");
+      subject.handleUp();
+    });
+
+    it("activates the previous item", function() {
+      expect(subject.activatePreviousItem).to.have.been.called;
+    });
+  });
+
+  describe("#handleEscape", function() {
+    beforeEach(function() {
+      sinon.spy(subject, "hide");
+      subject.handleEscape();
+    });
+
+    it("hides the list", function() {
+      expect(subject.hide).to.have.been.called;
+    });
+  });
+
+  describe("#handleEnter", function() {
+    describe("when an item is active", function() {
+      var item;
+      beforeEach(function() {
+        subject.createListItems(items);
+        item = _.first(subject.items);
+        item.activate();
+        sinon.spy(item, "select");
+        subject.handleEnter();
+      });
+
+      it("selects the active item", function() {
+        expect(item.select).to.have.been.called;
+      });
+    });
+
+    describe("when there is no active item", function() {
+      it("does not throw an error", function() {
+        expect(function() {
+          subject.handleEnter();
+        }).not.to.throw();
       });
     });
   });
 });
-

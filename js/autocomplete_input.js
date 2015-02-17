@@ -13,7 +13,7 @@ function AutocompleteInput(attributes) {
   this.value = this.attributes.value;
   this.$el = $(this.template({
     name: this.name,
-    value: this.value
+    value: this.value || ""
   }));
   this.$el.on("keyup", this.handleKeyup);
 }
