@@ -6,7 +6,7 @@ function someFunction() {
   console.log(this);
 }
 
-console.log("'this' is the window when the function is just invoked")
+console.log("'this' is the window when the function is just invoked");
 space();
 someFunction();
 space();
@@ -30,18 +30,18 @@ space();
 object.someMethod();
 space();
 
-console.log("but it goes back to window if we don't invoke it immediately after accessing it on the object");
+console.log("but it goes back to window if we don't invoke it on the object");
 space();
 var someMethod = object.someMethod;
 someMethod();
 space();
 
-console.log("'this' will be our object if we invoke it immediately after accessing it dynamically as well");
+console.log("'this' will be our object if we invoke it dynamically as well");
 space();
 object['some' + 'Method']();
 space();
 
-console.log("but again, it'll be window if it's not immediately invoked");
+console.log("but again, it'll be window if it's not invoked on the object");
 space();
 var someDynamicMethod = object['some' + 'Method'];
 someDynamicMethod();

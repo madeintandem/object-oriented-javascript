@@ -26,13 +26,7 @@
     <script>
       var autocompleteInstance = new Autocomplete({
         selector: "#autocomplete-field",
-        items: [
-          { value: 1, text: "Apples" },
-          { value: 2, text: "Bananas" },
-          { value: 3, text: "Carrots" },
-          { value: 4, text: "Capers" },
-          { value: 5, text: "Corn" }
-        ],
+        url: "fruit.json",
         onAutocomplete: function(item) {
           console.log(item);
         }
