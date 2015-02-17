@@ -4,10 +4,11 @@ function Autocomplete(attributes) {
   if (_.isUndefined(attributes.selector)) throw new Error("Autocomplete: selector is undefined");
   if (_.isUndefined(attributes.items || attributes.url)) throw new Error("Autocomplete: items or url is undefined");
 
-  this.initialize(attributes.selector, attributes.items || attributes.url);
+  this.initialize(attributes.selector, attributes.items || attributes.url, attributes.onAutocomplete);
 }
 
-Autocomplete.prototype.initialize = function(selector, itemsOrUrl) {
+Autocomplete.prototype.initialize = function(selector, itemsOrUrl, onAutocomplete) {
+  this.onAutocomplete = onAutocomplete || function() {};
   this.setupInput(selector);
   this.$el = this.$input.parent();
   this.completionList = new AutocompleteList({ onItemSelect: this.handleItemSelect });
@@ -49,4 +50,5 @@ Autocomplete.prototype.render = function() {
 Autocomplete.prototype.handleItemSelect = function(item) {
   this.$input.val(item.value);
   this.autocompleteInput.$el.val(item.text);
+  this.onAutocomplete(item);
 };

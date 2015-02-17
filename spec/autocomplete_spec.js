@@ -53,6 +53,23 @@ describe("Autocomplete", function() {
       expect(subject.completionList.attributes.onItemSelect).to.equal(subject.handleItemSelect);
     });
 
+    it("has a default onAutocomplete callback", function() {
+      expect(subject.onAutocomplete).to.be.a("function");
+    });
+
+    describe("onAutocomplete callback", function() {
+      it("sets the onAutocomplete callback", function() {
+        var callback = function() {};
+        subject = new Autocomplete({
+          selector: "#autocomplete",
+          items: items,
+          onAutocomplete: callback
+        });
+
+        expect(subject.onAutocomplete).to.equal(callback);
+      });
+    });
+
     describe("when items are passed", function() {
       it("has a local adapter", function() {
         subject = new Autocomplete({
@@ -77,6 +94,7 @@ describe("Autocomplete", function() {
   describe("#handleItemSelect", function() {
     var item;
     beforeEach(function() {
+      sinon.spy(subject, "onAutocomplete");
       item = new AutocompleteListItem({ item: _.first(items) });
       subject.handleItemSelect(item);
     });
@@ -87,6 +105,10 @@ describe("Autocomplete", function() {
 
     it("displays the item's text in the autocomplete input", function() {
       expect(subject.autocompleteInput.$el).to.have.value(item.text);
+    });
+
+    it("calls the onAutocomplete callback, passing it the selected item", function() {
+      expect(subject.onAutocomplete).to.have.been.calledWith(item);
     });
   });
 });

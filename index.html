@@ -32,7 +32,10 @@
           { value: 3, text: "Carrots" },
           { value: 4, text: "Capers" },
           { value: 5, text: "Corn" }
-        ]
+        ],
+        onAutocomplete: function(item) {
+          console.log(item);
+        }
       });
     </script>
   </body>
