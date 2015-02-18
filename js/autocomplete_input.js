@@ -1,6 +1,6 @@
 function AutocompleteInput(attributes) {
+  _.bindAll(this);
   this.attributes = attributes || {};
-  _.bindAll.apply(this, [this].concat(_.functions(this)));
   if (_.isUndefined(this.attributes.name)) throw new Error("AutocompleteInput: name is undefined");
   if (_.isUndefined(this.attributes.value)) throw new Error("AutocompleteInput: value is undefined");
 

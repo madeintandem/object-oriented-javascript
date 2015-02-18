@@ -1,6 +1,6 @@
 function AutocompleteListItem(attributes) {
+  _.bindAll(this);
   this.attributes = attributes || {};
-  _.bindAll.apply(this, [this].concat(_.functions(this)));
 
   this.value = attributes.item.value;
   this.text = attributes.item.text;

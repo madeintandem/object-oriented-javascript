@@ -1,5 +1,5 @@
 function Autocomplete(attributes) {
-  _.bindAll.apply(this, [this].concat(_.functions(this)));
+  _.bindAll(this);
   attributes = attributes || {};
   if (_.isUndefined(attributes.selector)) throw new Error("Autocomplete: selector is undefined");
   if (_.isUndefined(attributes.items || attributes.url)) throw new Error("Autocomplete: items or url is undefined");

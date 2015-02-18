@@ -1,5 +1,5 @@
 function AutocompleteList(attributes) {
-  _.bindAll.apply(this, [this].concat(_.functions(this)));
+  _.bindAll(this);
   this.attributes = attributes || {};
   _.defaults(this.attributes, {
     onItemSelect: function() { throw new Error("AutocompleteList: onItemSelect is undefined"); }

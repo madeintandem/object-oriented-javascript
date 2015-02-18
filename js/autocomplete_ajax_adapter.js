@@ -1,8 +1,8 @@
 function AutocompleteAjaxAdapter(attributes) {
+  _.bindAll(this);
   this.attributes = attributes || {};
   if (_.isUndefined(this.attributes.url)) throw new Error("AutocompleteAjaxAdapter: url is undefined");
   if (_.isUndefined(this.attributes.onAutocomplete)) throw new Error("AutocompleteAjaxAdapter: onAutocomplete is undefined");
-  _.bindAll.apply(this, [this].concat(_.functions(this)));
   this.throttleDelay = 250;
 }
 
