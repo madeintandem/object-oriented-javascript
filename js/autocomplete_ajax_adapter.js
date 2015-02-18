@@ -6,32 +6,36 @@ function AutocompleteAjaxAdapter(attributes) {
   this.throttleDelay = 250;
 }
 
-AutocompleteAjaxAdapter.prototype.handleTextEntry = function(text) {
-  this.query = text;
-  if (this.queuedRequest) {
-    clearTimeout(this.queuedRequest);
-  }
-  if (!text) {
-    this.attributes.onAutocomplete([]);
-    return;
-  }
-  this.queueRequest();
-};
+_.merge(AutocompleteAjaxAdapter.prototype, {
 
-AutocompleteAjaxAdapter.prototype.fetchItems = function() {
-  $.ajax({
-    url: this.attributes.url,
-    type: "get",
-    dataType: "json",
-    data: { query: this.query }
-  })
-    .done(this.attributes.onAutocomplete);
-};
+  handleTextEntry: function(text) {
+    this.query = text;
+    if (this.queuedRequest) {
+      clearTimeout(this.queuedRequest);
+    }
+    if (!text) {
+      this.attributes.onAutocomplete([]);
+      return;
+    }
+    this.queueRequest();
+  },
 
-AutocompleteAjaxAdapter.prototype.queueRequest = function() {
-  var _this = this;
-  this.queuedRequest = setTimeout(function() {
-    _this.fetchItems();
-  }, this.throttleDelay);
-};
+  fetchItems: function() {
+    $.ajax({
+      url: this.attributes.url,
+      type: "get",
+      dataType: "json",
+      data: { query: this.query }
+    })
+      .done(this.attributes.onAutocomplete);
+  },
+
+  queueRequest: function() {
+    var _this = this;
+    this.queuedRequest = setTimeout(function() {
+      _this.fetchItems();
+    }, this.throttleDelay);
+  }
+
+});
 

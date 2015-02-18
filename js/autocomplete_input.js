@@ -27,17 +27,21 @@ AutocompleteInput.CMD_KEYCODES = {
 
 AutocompleteInput.CMD_KEYCODES = _.merge(AutocompleteInput.CMD_KEYCODES, _.invert(AutocompleteInput.CMD_KEYCODES));
 
-AutocompleteInput.prototype.template = _.template("<input name='<%= name %>' class='autocomplete-input' value='<%= value %>' />");
+_.merge(AutocompleteInput.prototype, {
 
-AutocompleteInput.prototype.handleKeyup = function(evnt) {
-  if (this.isCommandKey(evnt.keyCode)) {
-    var command = AutocompleteInput.CMD_KEYCODES[evnt.keyCode];
-    this.attributes.onCommandEntry(command);
-  } else {
-    this.attributes.onTextEntry(this.$el.val());
+  template: _.template("<input name='<%= name %>' class='autocomplete-input' value='<%= value %>' />"),
+
+  handleKeyup: function(evnt) {
+    if (this.isCommandKey(evnt.keyCode)) {
+      var command = AutocompleteInput.CMD_KEYCODES[evnt.keyCode];
+      this.attributes.onCommandEntry(command);
+    } else {
+      this.attributes.onTextEntry(this.$el.val());
+    }
+  },
+
+  isCommandKey: function(keyCode) {
+    return _.contains(AutocompleteInput.CMD_KEYCODES, keyCode);
   }
-};
 
-AutocompleteInput.prototype.isCommandKey = function(keyCode) {
-  return _.contains(AutocompleteInput.CMD_KEYCODES, keyCode);
-};
+});

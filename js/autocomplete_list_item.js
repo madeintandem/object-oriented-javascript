@@ -16,22 +16,26 @@ function AutocompleteListItem(attributes) {
   this.registerEvents();
 }
 
-AutocompleteListItem.prototype.template = _.template('<li class="autocomplete-list-item"><a href="#"><%= text %></a></li>');
+_.merge(AutocompleteListItem.prototype, {
 
-AutocompleteListItem.prototype.registerEvents = function() {
-  this.$el.on("click", this.select);
-};
+  template: _.template('<li class="autocomplete-list-item"><a href="#"><%= text %></a></li>'),
 
-AutocompleteListItem.prototype.select = function() {
-  this.attributes.onSelect(this);
-};
+  registerEvents: function() {
+    this.$el.on("click", this.select);
+  },
 
-AutocompleteListItem.prototype.activate = function() {
-  this.active = true;
-  this.$el.addClass("active");
-};
+  select: function() {
+    this.attributes.onSelect(this);
+  },
 
-AutocompleteListItem.prototype.deactivate = function() {
-  this.active = false;
-  this.$el.removeClass("active");
-};
+  activate: function() {
+    this.active = true;
+    this.$el.addClass("active");
+  },
+
+  deactivate: function() {
+    this.active = false;
+    this.$el.removeClass("active");
+  }
+
+});

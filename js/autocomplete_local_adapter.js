@@ -5,15 +5,19 @@ function AutocompleteLocalAdapter(attributes) {
   _.bindAll.apply(this, [this].concat(_.functions(this)));
 }
 
-AutocompleteLocalAdapter.prototype.handleTextEntry = function(text) {
-  var items = [];
-  if (text) {
-    this.filter = new RegExp("^" + text, "i");
-    items = _.filter(this.attributes.items, this.itemMatchesFilter);
-  }
-  this.attributes.onAutocomplete(items);
-};
+_.merge(AutocompleteLocalAdapter.prototype, {
 
-AutocompleteLocalAdapter.prototype.itemMatchesFilter = function(item) {
-  return item.text.match(this.filter);
-};
+  handleTextEntry: function(text) {
+    var items = [];
+    if (text) {
+      this.filter = new RegExp("^" + text, "i");
+      items = _.filter(this.attributes.items, this.itemMatchesFilter);
+    }
+    this.attributes.onAutocomplete(items);
+  },
+
+  itemMatchesFilter: function(item) {
+    return item.text.match(this.filter);
+  }
+
+});
