@@ -70,6 +70,24 @@ describe("AutocompleteAjaxAdapter", function() {
         expect(clearTimeout).not.to.have.been.called;
       });
     });
+
+    describe("when the text is empty", function() {
+      it("does not queue a request", function() {
+        subject.handleTextEntry("");
+        expect(subject.queuedRequest).to.be.undefined;
+      });
+
+      it("clears a request out", function() {
+        subject.queuedRequest = 15;
+        subject.handleTextEntry("");
+        expect(clearTimeout).to.have.been.calledWith(subject.queuedRequest);
+      });
+
+      it("sends an empty array to the on autocomplete callback", function() {
+        subject.handleTextEntry("");
+        expect(subject.attributes.onAutocomplete).to.have.been.calledWith([]);
+      });
+    });
   });
 
   describe("#fetchItems", function() {
@@ -79,6 +97,34 @@ describe("AutocompleteAjaxAdapter", function() {
       expect(request.url).to.equal(subject.attributes.url);
       expect(request.method).to.equal("GET");
       expect(request.requestHeaders.Accept).to.match(/application\/json/);
+    });
+  });
+
+  describe("#queueRequest", function() {
+    beforeEach(function() {
+      subject.throttleDelay = 0;
+      sinon.spy(window, "setTimeout");
+      sinon.spy(subject, "fetchItems");
+      subject.queueRequest();
+    });
+
+    afterEach(function() {
+      setTimeout.restore();
+    });
+
+    it("queues a fetch items request", function() {
+      expect(subject.queuedRequest).to.be.a("number");
+    });
+
+    it("fetches the items after the throttle delay", function() {
+      expect(setTimeout).to.have.been.called;
+
+      var args = _.first(setTimeout.args);
+      var callback = _.first(args);
+      var throttleDelay = _.last(args);
+      callback();
+      expect(subject.fetchItems).to.have.been.called;
+      expect(throttleDelay).to.equal(subject.throttleDelay);
     });
   });
 });

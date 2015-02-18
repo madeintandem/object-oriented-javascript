@@ -11,6 +11,10 @@ AutocompleteAjaxAdapter.prototype.handleTextEntry = function(text) {
   if (this.queuedRequest) {
     clearTimeout(this.queuedRequest);
   }
+  if (!text) {
+    this.attributes.onAutocomplete([]);
+    return;
+  }
   this.queueRequest();
 };
 
@@ -18,6 +22,7 @@ AutocompleteAjaxAdapter.prototype.fetchItems = function() {
   $.ajax({
     url: this.attributes.url,
     type: "get",
+    dataType: "json",
     data: { query: this.query }
   })
     .done(this.attributes.onAutocomplete);
